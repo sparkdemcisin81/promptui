@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"sync"
 	"text/template"
+	"time"
 
+	"github.com/1lann/promptui/screenbuf"
 	"github.com/chzyer/readline"
-	"github.com/manifoldco/promptui/screenbuf"
 )
 
 // Prompt represents a single line text field input with options for validation and input masks.
@@ -113,6 +115,9 @@ type PromptTemplates struct {
 // Run will keep the prompt alive until it has been canceled from the command prompt or it has received a valid
 // value. It will return the value and an error if any occurred during the prompt's execution.
 func (p *Prompt) Run() (string, error) {
+	mutex := new(sync.Mutex)
+	closing := false
+
 	var err error
 
 	err = p.prepareTemplates()
@@ -159,6 +164,13 @@ func (p *Prompt) Run() (string, error) {
 	cur := NewCursor(input, p.Pointer, eraseDefault)
 
 	listen := func(input []rune, pos int, key rune) ([]rune, int, bool) {
+		mutex.Lock()
+		defer mutex.Unlock()
+
+		if closing {
+			return nil, 0, false
+		}
+
 		_, _, keepOn := cur.Listen(input, pos, key)
 		err := validFn(cur.Get())
 		var prompt []byte
@@ -193,7 +205,11 @@ func (p *Prompt) Run() (string, error) {
 
 	for {
 		_, err = rl.Readline()
+		// TODO: hack to prevent race readline's ioloop race condition
+		time.Sleep(time.Millisecond * 100)
+		mutex.Lock()
 		inputErr = validFn(cur.Get())
+		mutex.Unlock()
 		if inputErr == nil {
 			break
 		}
@@ -202,6 +218,11 @@ func (p *Prompt) Run() (string, error) {
 			break
 		}
 	}
+
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	closing = true
 
 	if err != nil {
 		switch err {
@@ -213,6 +234,7 @@ func (p *Prompt) Run() (string, error) {
 		if err.Error() == "Interrupt" {
 			err = ErrInterrupt
 		}
+
 		sb.Reset()
 		sb.WriteString("")
 		sb.Flush()
@@ -231,7 +253,7 @@ func (p *Prompt) Run() (string, error) {
 
 	if p.IsConfirm {
 		lowerDefault := strings.ToLower(p.Default)
-		if strings.ToLower(cur.Get()) != "y" && (lowerDefault != "y" || (lowerDefault == "y" && cur.Get() != "")) {
+		if strings.ToLower(echo) != "y" && (lowerDefault != "y" || (lowerDefault == "y" && echo != "")) {
 			prompt = render(p.Templates.invalid, p.Label)
 			err = ErrAbort
 		}

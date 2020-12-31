@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/manifoldco/promptui"
+	"github.com/1lann/promptui"
 )
 
 func main() {
