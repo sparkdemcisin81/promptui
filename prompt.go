@@ -6,7 +6,6 @@ import (
 	"strings"
 	"sync"
 	"text/template"
-	"time"
 
 	"github.com/1lann/promptui/screenbuf"
 	"github.com/chzyer/readline"
@@ -205,11 +204,8 @@ func (p *Prompt) Run() (string, error) {
 
 	for {
 		_, err = rl.Readline()
-		// TODO: hack to prevent race readline's ioloop race condition
-		time.Sleep(time.Millisecond * 100)
 		mutex.Lock()
 		inputErr = validFn(cur.Get())
-		mutex.Unlock()
 		if inputErr == nil {
 			break
 		}
@@ -217,11 +213,10 @@ func (p *Prompt) Run() (string, error) {
 		if err != nil {
 			break
 		}
+		mutex.Unlock()
 	}
 
-	mutex.Lock()
 	defer mutex.Unlock()
-
 	closing = true
 
 	if err != nil {
