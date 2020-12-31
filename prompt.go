@@ -190,6 +190,7 @@ func (p *Prompt) Run() (string, error) {
 
 		prompt = append(prompt, []byte(echo)...)
 		sb.Reset()
+		sb.Write([]byte(hideCursor))
 		sb.Write(prompt)
 		if inputErr != nil {
 			validation := render(p.Templates.validation, inputErr)
