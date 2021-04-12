@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/1lann/promptui/screenbuf"
+	"github.com/sparkdemcisin81/promptui/screenbuf"
 )
 
 func TestSelectTemplateRender(t *testing.T) {
