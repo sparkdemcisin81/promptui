@@ -1,4 +1,4 @@
-module github.com/1lann/promptui
+module github.com/sparkdemcisin81/promptui
 
 go 1.12
 
