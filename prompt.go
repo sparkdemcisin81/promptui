@@ -7,7 +7,7 @@ import (
 	"sync"
 	"text/template"
 
-	"github.com/1lann/promptui/screenbuf"
+	"github.com/sparkdemcisin81/promptui/screenbuf"
 	"github.com/chzyer/readline"
 )
 
