@@ -105,3 +105,39 @@ func main() {
 ### More Examples
 
 See full list of [examples](https://github.com/manifoldco/promptui/tree/master/_examples)
+
+Config file can contain the folowing items:
+
+FwFileName: path_to_fw.zip
+
+DeviceRevision: YOUR_DEVICE_REVISION // example: "1.00"
+
+DeviceModel: S020M or S020S
+
+Port: YOUR_PORT // example:/dev/ttyUSB0
+
+AwsKeyID: KEY_ID
+
+AwsAccessKey: ACCES_KEY
+
+Region: YOUR_REGION // example:eu-central-1
+
+WiFiSSID: YOUR_SSID
+
+WiFiPass: YOUR_PASS
+
+// if LicenseKey is emty 'License' will be written to the device
+
+// if not emty a new license will be requested
+
+LicenseKey: YOUR_LICENSE_KEY 
+
+// can be copied from the device if it already has a licence, 'LicenseKey' should be emty in that case
+
+License: YOUR_LICENSE 
+
+// if emty a new serial number will be created
+
+// id not empty the provided  erial number will be used
+
+SerialNumber: YOUR_SERIAL_NUMBER
